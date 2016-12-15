@@ -72,7 +72,7 @@ class HamtUtilsTest extends GroovyTestCase {
     }
 
     void testNullObj() {
-        def tree = new Hamt<Double, String>({ d -> 23L } as Function<Double, Long>)
+        def tree = new Hamt<Double, String>()
 
         tree.put(null, "null or thereabouts")
 
