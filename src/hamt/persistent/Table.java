@@ -5,7 +5,7 @@ import hamt.Utils;
 
 import java.util.Arrays;
 
-public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
     private final long population;
     private final Node<Key, Value>[] children;
 

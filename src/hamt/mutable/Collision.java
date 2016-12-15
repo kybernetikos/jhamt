@@ -9,7 +9,7 @@ import hamt.Node;
 /*
  * A collision stores multiple entries that all share the same hash.
  */
-public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+class Collision<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
 
     private final long hash;
     private final List<Entry<Key, Value>> children;

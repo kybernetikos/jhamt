@@ -8,7 +8,7 @@ import java.util.Comparator;
 /*
  * An Entry stores the relationship between a key and value.
  */
-public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
     static final Comparator<Entry> keyComparator = Comparator.comparing(Entry::getKey, Utils.nullFriendlyComparator);
     private final long hash;
     private final Key key;

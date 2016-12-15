@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
     private long population;
     private final List<Node<Key, Value>> children;
 
