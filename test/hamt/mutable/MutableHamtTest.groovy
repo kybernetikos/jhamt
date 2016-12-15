@@ -50,15 +50,17 @@ class MutableHamtTest extends GroovyTestCase {
     }
 
     static void doSomeAddAndRemoves(rnd, num, tree) {
+        def randomStrings = ["hello", "world", "marvellous", "things"]
         def data = [:]
         for (number in 0..num) {
             def key = rnd.nextDouble()
-            data[key] = "a"
-            tree.put(key, "a")
+            def value = randomStrings.getAt(rnd.nextInt(randomStrings.size()))
+            data[key] = value
+            tree.put(key, value)
         }
 
         for (key in data.keySet()) {
-            assert tree.get((Double) key) == "a"
+            assert tree.get((Double) key) == data[key]
             tree.remove((Double) key)
             assert tree.get((Double) key) == null
         }

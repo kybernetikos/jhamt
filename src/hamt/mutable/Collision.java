@@ -80,7 +80,7 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
     public String toString() {
         return "Collision{" +
                 "hash=" + hash +
-                ", children=" + children +
+                ", children=" + children.size() + ":" + children +
                 '}';
     }
 }

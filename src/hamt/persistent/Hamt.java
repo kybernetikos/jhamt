@@ -84,7 +84,7 @@ public class Hamt<Key extends Comparable<Key>, Value> {
     @Override
     public String toString() {
         return "Hamt{" +
-                "  nodes=" + Arrays.toString(nodes) +
+                "nodes=" + nodes.length + ":" + Arrays.toString(nodes) +
                 '}';
     }
 

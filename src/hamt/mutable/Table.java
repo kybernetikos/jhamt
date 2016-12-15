@@ -84,7 +84,7 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
     public String toString() {
         return "Table{" +
                 "population=" + Long.toBinaryString(population) +
-                ", children=" + children +
+                ", children=" + children.size() + ":" + children +
                 '}';
     }
 }
