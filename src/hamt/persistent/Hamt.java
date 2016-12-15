@@ -6,6 +6,12 @@ import hamt.Utils;
 import java.util.Arrays;
 import java.util.function.Function;
 
+/*
+ * Paper at http://lampwww.epfl.ch/papers/idealhashtrees.pdf
+ * TODO: automatic root table resizing
+ * TODO: pool unneeded entries and nodes
+ * TODO: rehash instead of collision bucket
+ */
 public class Hamt<Key extends Comparable<Key>, Value> {
     private static final int defaultTopLevelBits = 10;
 
