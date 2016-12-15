@@ -1,5 +1,8 @@
 package hamt.persistent;
 
+import hamt.Node;
+import hamt.Utils;
+
 import java.util.Arrays;
 
 /*
@@ -28,7 +31,7 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
         assert entry2 != null;
 
         final Entry[] children = new Entry[]{entry1, entry2};
-        Arrays.sort(children, Utils.keyComparator);
+        Arrays.sort(children, Entry.keyComparator);
         return new Collision(hash, children);
     }
 
@@ -37,7 +40,7 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
         if (hash != this.hash) {
             return notPresent;
         }
-        final int index = Arrays.binarySearch(children, new Entry<>(hash, key, notPresent), Utils.keyComparator);
+        final int index = Arrays.binarySearch(children, new Entry<>(hash, key, notPresent), Entry.keyComparator);
         if (index >= 0) {
             return children[index].getValue();
         }
@@ -48,7 +51,7 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
     public Node<Key, Value> set(final long hash, final int place, final Key key, final Value value) {
         if (hash == this.hash) {
             final Entry<Key, Value> entry = new Entry<>(hash, key, value);
-            final int index = Arrays.binarySearch(children, entry, Utils.keyComparator);
+            final int index = Arrays.binarySearch(children, entry, Entry.keyComparator);
             if (index >= 0) {
                 if (children[index].getValue() == value) {
                     return this;
@@ -68,7 +71,7 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
             return this;
         }
         final Entry<Key, Value> entry = new Entry<>(hash, key, null);
-        final int index = Arrays.binarySearch(children, entry, Utils.keyComparator);
+        final int index = Arrays.binarySearch(children, entry, Entry.keyComparator);
         if (index < 0) {
             return this;
         }

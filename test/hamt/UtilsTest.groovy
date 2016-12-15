@@ -1,8 +1,7 @@
-package hamt.persistent
+package hamt
 
-import java.util.function.Function
+class UtilsTest extends GroovyTestCase {
 
-class HamtUtilsTest extends GroovyTestCase {
     void testIndex32() {
         println "index32 Test"
         assert Utils.index32(0b0000_0000_0000_0000_0000_0000_0000_0000i, 0) == -1
@@ -29,62 +28,5 @@ class HamtUtilsTest extends GroovyTestCase {
         assert Utils.index64(0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000l, 63) == 0
         assert Utils.index64(0b1000_0000_0100_0000_0000_0100_0000_0000_0000_0000_0000_0000_0000_0100_0000_0100l, 63) == 4
         assert Utils.index64(0b0000_0000_0100_0000_0000_0100_0000_0000_0000_0000_0000_0000_0000_0100_0000_0100l, 63) == -5
-    }
-
-    void testObjRem() {
-        def seed = new Date().getTime()
-        def rnd = new Random(seed)
-        println "Random obj Test with seed $seed"
-        def tree = new Hamt<Double, String>()
-
-        def data = [:]
-        for (number in 0..1000) {
-            def key = rnd.nextDouble()
-            data[key] = "a"
-            tree = tree.put(key, "a")
-        }
-
-        for (key in data.keySet()) {
-            assert tree.get((Double) key) == "a"
-            tree = tree.remove((Double) key)
-            assert tree.get((Double) key) == null
-        }
-    }
-
-    void testBadHasherObjRem() {
-        def seed = new Date().getTime()
-        def rnd = new Random(seed)
-        println "Bad hash (exercise collisions) obj Test with seed $seed"
-        def tree = new Hamt<Double, String>({ d -> Double.doubleToLongBits(d) >>> 45 } as Function<Double, Long>)
-
-        def data = [:]
-        for (number in 0..10000) {
-            def key = rnd.nextDouble()
-            data[key] = "a"
-            tree = tree.put(key, "a")
-        }
-
-        for (key in data.keySet()) {
-            assert tree.get((Double) key) == "a"
-            tree = tree.remove((Double) key)
-            assert tree.get((Double) key) == null
-        }
-    }
-
-    void testNullObj() {
-        println "Test with some null values"
-
-        def tree = new Hamt<Double, String>()
-        tree = tree.put(null, "null or thereabouts")
-
-        assert tree.get(null) == "null or thereabouts"
-
-        tree = tree.put(null, null)
-
-        assert tree.get(null) == null
-        assert tree.get(null, "empty") == null
-
-        tree = tree.remove(null)
-        assert tree.get(null, "empty") == "empty"
     }
 }

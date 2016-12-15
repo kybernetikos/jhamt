@@ -1,19 +1,17 @@
-package hamt.persistent;
+package hamt;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
 public class Utils {
     // the number of bits each level of the tree uses
-    static final int maskBits = 6;
+    public static final int maskBits = 6;
     // a mask with maskBits number of 1s.  It will be shifted according to depth in the tree in order to extract
     // some of the hash bits.
-    static final long mask = (1L << maskBits) - 1;
-
+    private static final long mask = (1L << maskBits) - 1;
     @SuppressWarnings("unchecked")
     private static final Comparator<Comparable> natural = Comparator.naturalOrder();
-    final static Comparator<Comparable> nullFriendlyComparator = Comparator.nullsLast(natural);
-    static final Comparator<Entry> keyComparator = Comparator.comparing(Entry::getKey, nullFriendlyComparator);
+    public final static Comparator<Comparable> nullFriendlyComparator = Comparator.nullsLast(natural);
 
     public static int index32(final int population, final int index) {
         assert index >= 0;
@@ -39,13 +37,13 @@ public class Utils {
         return -lowerCount - 1;
     }
 
-    static int extractHashPart(final long hash, final int place) {
+    public static int extractHashPart64(final long hash, final int place) {
         assert place >= 0;
 
         return (int) ((hash & (mask << place)) >>> place);
     }
 
-    static <T> T[] arrayInsert(final T[] array, final int position, final T value) {
+    public static <T> T[] arrayInsert(final T[] array, final int position, final T value) {
         assert array != null;
         assert position <= array.length;
         assert position >= 0;
@@ -56,7 +54,7 @@ public class Utils {
         return nodes;
     }
 
-    static <T> T[] arrayRemove(final T[] array, final int position) {
+    public static <T> T[] arrayRemove(final T[] array, final int position) {
         assert array != null;
         assert position < array.length;
         assert position >= 0;
@@ -66,7 +64,7 @@ public class Utils {
         return nodes;
     }
 
-    static <T> T[] arrayReplace(final T[] array, final int position, final T value) {
+    public static <T> T[] arrayReplace(final T[] array, final int position, final T value) {
         assert array != null;
         assert position < array.length;
         assert position >= 0;

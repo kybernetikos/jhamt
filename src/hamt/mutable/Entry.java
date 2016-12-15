@@ -1,18 +1,19 @@
-package hamt.persistent;
+package hamt.mutable;
 
-import hamt.Node;
 import hamt.Utils;
-
+import hamt.Node;
 import java.util.Comparator;
 
 /*
  * An Entry stores the relationship between a key and value.
  */
 public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+    @SuppressWarnings("unchecked")
     static final Comparator<Entry> keyComparator = Comparator.comparing(Entry::getKey, Utils.nullFriendlyComparator);
+
     private final long hash;
     private final Key key;
-    private final Value value;
+    private Value value;
 
     Entry(final long hash, final Key key, final Value value) {
         this.hash = hash;
@@ -35,9 +36,11 @@ public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Valu
                 if (this.value == value) {
                     return this;
                 }
-                return new Entry<>(hash, key, value);
+                this.value = value;
+                return this;
             } else {
-                return Collision.fromEntries(hash, this, new Entry<>(hash, key, value));
+                //noinspection unchecked
+                return new Collision<>(hash, this, new Entry<>(hash, key, value));
             }
         }
         return Table.fromSingleNode(this.hash, place, this).set(hash, place, key, value);

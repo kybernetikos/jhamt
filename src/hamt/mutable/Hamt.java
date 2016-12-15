@@ -1,8 +1,7 @@
-package hamt.persistent;
+package hamt.mutable;
 
-import hamt.Node;
 import hamt.Utils;
-
+import hamt.Node;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -15,7 +14,6 @@ public class Hamt<Key extends Comparable<Key>, Value> {
     private final Function<Key, Long> hashFunction;
     private final Node<Key, Value>[] nodes;
 
-    @SuppressWarnings("unchecked")
     public Hamt() {
         // I reverse the bytes because otherwise an int32 hashcode would leave all the most significant bits
         // of the hash empty, resulting in an unnecessarily nested structure.
@@ -28,13 +26,8 @@ public class Hamt<Key extends Comparable<Key>, Value> {
 
     @SuppressWarnings("unchecked")
     public Hamt(final Function<Key, Long> hashFunction, final int topLevelBits) {
-        this(hashFunction, topLevelBits, new Node[1 << topLevelBits]);
-    }
-
-    private Hamt(final Function<Key, Long> hashFunction, final int topLevelBits, final Node<Key, Value>[] nodes) {
         assert topLevelBits >= 0;
         assert topLevelBits <= 64;
-        assert nodes.length == 1 << topLevelBits;
         if (hashFunction == null) {
             throw new NullPointerException("If you wish to use a default hash function, call the 0-arg constructor.");
         }
@@ -42,7 +35,7 @@ public class Hamt<Key extends Comparable<Key>, Value> {
         this.hashFunction = hashFunction;
         this.topLevelBits = topLevelBits;
         this.nextPlace = 64 - topLevelBits - Utils.maskBits;
-        this.nodes = nodes;
+        this.nodes = new Node[1 << topLevelBits];
     }
 
     public Value get(final Key key) {
@@ -60,25 +53,24 @@ public class Hamt<Key extends Comparable<Key>, Value> {
         return node.get(hash, nextPlace, key, notPresent);
     }
 
-    public Hamt<Key, Value> put(final Key key, final Value value) {
+    public void put(final Key key, final Value value) {
         final long hash = hashFunction.apply(key);
         final int realIndex = getIndex(hash);
         final Node<Key, Value> node = nodes[realIndex];
         if (node == null) {
-            return withNodes(Utils.arrayReplace(nodes, realIndex, new Entry<>(hash, key, value)));
+            nodes[realIndex] = new Entry<>(hash, key, value);
         } else {
-            return withNodes(Utils.arrayReplace(nodes, realIndex, node.set(hash, nextPlace, key, value)));
+            nodes[realIndex] = node.set(hash, nextPlace, key, value);
         }
     }
 
-    public Hamt<Key, Value> remove(final Key key) {
+    public void remove(final Key key) {
         final long hash = hashFunction.apply(key);
         final int realIndex = getIndex(hash);
         final Node<Key, Value> node = nodes[realIndex];
         if (node != null) {
-            return withNodes(Utils.arrayReplace(nodes, realIndex, node.remove(hash, nextPlace, key)));
+            nodes[realIndex] = node.remove(hash, nextPlace, key);
         }
-        return this;
     }
 
     @Override
@@ -93,9 +85,5 @@ public class Hamt<Key extends Comparable<Key>, Value> {
             return 0;
         }
         return (int) (hash >>> (64 - topLevelBits));
-    }
-
-    private Hamt<Key, Value> withNodes(Node<Key, Value>[] newNodes) {
-        return new Hamt<>(hashFunction, topLevelBits, newNodes);
     }
 }

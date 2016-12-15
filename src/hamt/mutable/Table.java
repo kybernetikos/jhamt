@@ -1,33 +1,33 @@
-package hamt.persistent;
+package hamt.mutable;
 
-import hamt.Node;
 import hamt.Utils;
-
+import hamt.Node;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
-    private final long population;
-    private final Node<Key, Value>[] children;
+    private long population;
+    private final List<Node<Key, Value>> children;
 
     /*
      * Do not modify the children array once it has been passed in.
      * Children must not be empty.
      * The population must be correctly set to describe the position of the children.
      */
-    private Table(final long population, final Node<Key, Value>[] children) {
+    private Table(final long population, Node<Key, Value>... children) {
         assert Long.bitCount(population) == children.length;
         assert children.length > 0;
 
         this.population = population;
-        this.children = children;
+        this.children = new ArrayList<>(Arrays.asList(children));
     }
 
     @SuppressWarnings("unchecked")
     static <Key extends Comparable<Key>, Value> Table<Key, Value> fromSingleNode(final long hash, final int place, final Node<Key, Value> node) {
         assert node != null;
-
         final int newPartHash = Utils.extractHashPart64(hash, place);
-        return new Table(1L << newPartHash, new Node[]{node});
+        return new Table(1L << newPartHash, node);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
         if (realIndex < 0) {
             return notPresent;
         }
-        final Node<Key, Value> newNode = children[realIndex];
+        final Node<Key, Value> newNode = children.get(realIndex);
         return newNode.get(hash, place - Utils.maskBits, key, notPresent);
     }
 
@@ -47,15 +47,13 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
         final int realIndex = Utils.index64(population, newPartHash);
         if (realIndex < 0) {
             final int newLocation = -realIndex - 1;
-            final long newPopulation = population | (1L << newPartHash);
-            return new Table<>(newPopulation, Utils.arrayInsert(children, newLocation, new Entry<>(hash, key, value)));
+            population |= 1L << newPartHash;
+            children.add(newLocation, new Entry<>(hash, key, value));
         } else {
-            final Node<Key, Value> newNode = children[realIndex].set(hash, place - Utils.maskBits, key, value);
-            if (children[realIndex] == newNode) {
-                return this;
-            }
-            return new Table<>(population, Utils.arrayReplace(children, realIndex, newNode));
+            final Node<Key, Value> newNode = children.get(realIndex).set(hash, place - Utils.maskBits, key, value);
+            children.set(realIndex, newNode);
         }
+        return this;
     }
 
     @Override
@@ -64,19 +62,19 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
         final int realIndex = Utils.index64(population, newPartHash);
         final long popPos = 1L << newPartHash;
         if (realIndex >= 0) {
-            final Node<Key, Value> newNode = children[realIndex].remove(hash, place - Utils.maskBits, key);
+            final Node<Key, Value> newNode = children.get(realIndex).remove(hash, place - Utils.maskBits, key);
             if (newNode != null) {
-                return new Table<>(population, Utils.arrayReplace(children, realIndex, newNode));
+                children.set(realIndex, newNode);
+                return this;
             } else {
-                final Node<Key, Value>[] newChildren = Utils.arrayRemove(children, realIndex);
-                if (newChildren.length == 0) {
+                if (children.size() == 1) {
                     return null;
                 }
-                if (newChildren.length == 1 && !(newChildren[0] instanceof Table)) {
-                    return newChildren[0];
+                children.remove(realIndex);
+                if (children.size() == 1 && !(children.get(0) instanceof Table)) {
+                    return children.get(0);
                 }
-                final long newPopulation = (~popPos) & population;
-                return new Table<>(newPopulation, newChildren);
+                population &= ~popPos;
             }
         }
         return this;
@@ -86,7 +84,7 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
     public String toString() {
         return "Table{" +
                 "population=" + Long.toBinaryString(population) +
-                ", children=" + Arrays.toString(children) +
+                ", children=" + children +
                 '}';
     }
 }
