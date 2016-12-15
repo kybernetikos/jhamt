@@ -1,8 +1,14 @@
 package hamt;
 
+import java.util.Comparator;
+
 public class Utils {
 
-    public static int index32(int population, int index) {
+    static final @SuppressWarnings("unchecked") Comparator<Entry> keyComparator = Comparator.comparing(Entry::getKey, Comparator.nullsLast(Comparator.naturalOrder()));
+    static final int maskBits = 6;
+    static final long mask = (1L << maskBits) - 1;
+
+    public static int index32(final int population, final int index) {
         assert index >= 0;
         assert index < 32;
 
@@ -14,7 +20,7 @@ public class Utils {
         return -lowerCount - 1;
     }
 
-    public static int index64(long population, int index) {
+    public static int index64(final long population, final int index) {
         assert index >= 0;
         assert index < 64;
 

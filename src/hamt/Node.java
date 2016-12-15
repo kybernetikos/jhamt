@@ -1,4 +1,4 @@
-package hamt.oo;
+package hamt;
 
 interface Node<Key extends Comparable<Key>, Value> {
     Value get(long hash, int place, Key key, Value notPresent);

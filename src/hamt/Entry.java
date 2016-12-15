@@ -1,4 +1,4 @@
-package hamt.oo;
+package hamt;
 
 import java.util.Comparator;
 
@@ -8,7 +8,7 @@ public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Valu
     private final Key key;
     private final Value value;
 
-    Entry(long hash, Key key, Value value) {
+    Entry(final long hash, final Key key, final Value value) {
         this.hash = hash;
         this.key = key;
         this.value = value;
@@ -23,8 +23,7 @@ public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Valu
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Node<Key, Value> set(long hash, int place, Key key, Value value) {
+    public Node<Key, Value> set(final long hash, final int place, final Key key, final Value value) {
         if (hash == this.hash) {
             if (comparator.compare(this.key, key) == 0) {
                 if (this.value == value) {
@@ -32,14 +31,14 @@ public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Valu
                 }
                 return new Entry<>(hash, key, value);
             } else {
-                return new Collision<>(hash, this, new Entry<>(hash, key, value));
+                return Collision.fromEntries(hash, this, new Entry<>(hash, key, value));
             }
         }
         return Table.fromSingleNode(this.hash, place, this).set(hash, place, key, value);
     }
 
     @Override
-    public Node<Key, Value> remove(long hash, int place, Key key) {
+    public Node<Key, Value> remove(final long hash, final int place, final Key key) {
         if (hash == this.hash && comparator.compare(this.key, key) == 0) {
             return null;
         }
@@ -55,11 +54,11 @@ public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Valu
                 '}';
     }
 
-    public Key getKey() {
+    Key getKey() {
         return key;
     }
 
-    public Value getValue() {
+    Value getValue() {
         return value;
     }
 }
