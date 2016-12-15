@@ -1,4 +1,4 @@
-package hamt;
+package hamt.persistent;
 
 /*
  * An Entry stores the relationship between a key and value.

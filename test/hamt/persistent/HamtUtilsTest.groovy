@@ -1,4 +1,4 @@
-package hamt
+package hamt.persistent
 
 import java.util.function.Function
 
@@ -41,12 +41,12 @@ class HamtUtilsTest extends GroovyTestCase {
         for (number in 0..1000) {
             def key = rnd.nextDouble()
             data[key] = "a"
-            tree.put(key, "a")
+            tree = tree.put(key, "a")
         }
 
         for (key in data.keySet()) {
             assert tree.get((Double) key) == "a"
-            tree.remove((Double) key)
+            tree = tree.remove((Double) key)
             assert tree.get((Double) key) == null
         }
     }
@@ -61,12 +61,12 @@ class HamtUtilsTest extends GroovyTestCase {
         for (number in 0..10000) {
             def key = rnd.nextDouble()
             data[key] = "a"
-            tree.put(key, "a")
+            tree = tree.put(key, "a")
         }
 
         for (key in data.keySet()) {
             assert tree.get((Double) key) == "a"
-            tree.remove((Double) key)
+            tree = tree.remove((Double) key)
             assert tree.get((Double) key) == null
         }
     }
@@ -75,16 +75,16 @@ class HamtUtilsTest extends GroovyTestCase {
         println "Test with some null values"
 
         def tree = new Hamt<Double, String>()
-        tree.put(null, "null or thereabouts")
+        tree = tree.put(null, "null or thereabouts")
 
         assert tree.get(null) == "null or thereabouts"
 
-        tree.put(null, null)
+        tree = tree.put(null, null)
 
         assert tree.get(null) == null
         assert tree.get(null, "empty") == null
 
-        tree.remove(null)
+        tree = tree.remove(null)
         assert tree.get(null, "empty") == "empty"
     }
 }

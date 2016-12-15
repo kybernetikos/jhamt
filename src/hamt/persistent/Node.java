@@ -1,4 +1,4 @@
-package hamt;
+package hamt.persistent;
 
 /*
  * A Node can be either a single or multiple Key/Value Entries.

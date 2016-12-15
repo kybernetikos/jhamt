@@ -1,4 +1,4 @@
-package hamt;
+package hamt.persistent;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -46,6 +46,10 @@ public class Utils {
     }
 
     static <T> T[] arrayInsert(final T[] array, final int position, final T value) {
+        assert array != null;
+        assert position <= array.length;
+        assert position >= 0;
+
         final T[] nodes = Arrays.copyOf(array, array.length + 1);
         System.arraycopy(nodes, position, nodes, position + 1, array.length - position);
         nodes[position] = value;
@@ -53,8 +57,25 @@ public class Utils {
     }
 
     static <T> T[] arrayRemove(final T[] array, final int position) {
+        assert array != null;
+        assert position < array.length;
+        assert position >= 0;
+
         final T[] nodes = Arrays.copyOf(array, array.length - 1);
         System.arraycopy(array, position + 1, nodes, position, array.length - position - 1);
+        return nodes;
+    }
+
+    static <T> T[] arrayReplace(final T[] array, final int position, final T value) {
+        assert array != null;
+        assert position < array.length;
+        assert position >= 0;
+
+        if (array[position] == value) {
+            return array;
+        }
+        final T[] nodes = Arrays.copyOf(array, array.length);
+        nodes[position] = value;
         return nodes;
     }
 }

@@ -1,4 +1,4 @@
-package hamt;
+package hamt.persistent;
 
 import java.util.Arrays;
 
@@ -53,12 +53,9 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
                 if (children[index].getValue() == value) {
                     return this;
                 }
-                final Entry<Key, Value>[] result = Arrays.copyOf(children, children.length);
-                result[index] = entry;
-                return new Collision<>(hash, result);
+                return new Collision<>(hash, Utils.arrayReplace(children, index, entry));
             } else {
-                final Entry<Key, Value>[] result = Utils.arrayInsert(children, -index - 1, entry);
-                return new Collision<>(hash, result);
+                return new Collision<>(hash, Utils.arrayInsert(children, -index - 1, entry));
             }
         } else {
             return Table.fromSingleNode(this.hash, place, this).set(hash, place, key, value);
@@ -78,8 +75,7 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
         if (children.length == 2) {
             return children[1 - index];
         }
-        final Entry<Key, Value>[] newChildren = Utils.arrayRemove(children, index);
-        return new Collision<>(hash, newChildren);
+        return new Collision<>(hash, Utils.arrayRemove(children, index));
     }
 
     @Override

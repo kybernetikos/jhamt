@@ -1,4 +1,4 @@
-package hamt;
+package hamt.persistent;
 
 import java.util.Arrays;
 
@@ -44,16 +44,14 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
         final int realIndex = Utils.index64(population, newPartHash);
         if (realIndex < 0) {
             final int newLocation = -realIndex - 1;
-            final Node<Key, Value>[] nodes = Utils.arrayInsert(children, newLocation, new Entry<>(hash, key, value));
-            return new Table<>(population | (1L << newPartHash), nodes);
+            final long newPopulation = population | (1L << newPartHash);
+            return new Table<>(newPopulation, Utils.arrayInsert(children, newLocation, new Entry<>(hash, key, value)));
         } else {
-            final Node<Key, Value>[] nodes = Arrays.copyOf(children, children.length);
-            final Node<Key, Value> newNode = nodes[realIndex].set(hash, place - Utils.maskBits, key, value);
-            if (nodes[realIndex] == newNode) {
+            final Node<Key, Value> newNode = children[realIndex].set(hash, place - Utils.maskBits, key, value);
+            if (children[realIndex] == newNode) {
                 return this;
             }
-            nodes[realIndex] = newNode;
-            return new Table<>(population, nodes);
+            return new Table<>(population, Utils.arrayReplace(children, realIndex, newNode));
         }
     }
 
@@ -65,9 +63,7 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
         if (realIndex >= 0) {
             final Node<Key, Value> newNode = children[realIndex].remove(hash, place - Utils.maskBits, key);
             if (newNode != null) {
-                final Node<Key, Value>[] newChildren = Arrays.copyOf(children, children.length);
-                newChildren[realIndex] = newNode;
-                return new Table<>(population, newChildren);
+                return new Table<>(population, Utils.arrayReplace(children, realIndex, newNode));
             } else {
                 final Node<Key, Value>[] newChildren = Utils.arrayRemove(children, realIndex);
                 if (newChildren.length == 0) {
@@ -76,7 +72,8 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
                 if (newChildren.length == 1 && !(newChildren[0] instanceof Table)) {
                     return newChildren[0];
                 }
-                return new Table<>((~popPos) & population, newChildren);
+                final long newPopulation = (~popPos) & population;
+                return new Table<>(newPopulation, newChildren);
             }
         }
         return this;
