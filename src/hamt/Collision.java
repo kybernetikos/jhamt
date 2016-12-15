@@ -7,16 +7,6 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
     private final long hash;
     private final Entry<Key, Value>[] children;
 
-    @SuppressWarnings("unchecked")
-    static <Key extends Comparable<Key>, Value> Collision<Key, Value> fromEntries(final long hash, final Entry<Key, Value> entry1, final Entry<Key, Value> entry2) {
-        assert entry1 != null;
-        assert entry2 != null;
-
-        final Entry[] children = new Entry[] {entry1, entry2};
-        Arrays.sort(children, Utils.keyComparator);
-        return new Collision(hash, children);
-    }
-
     /**
      * Children must be currently sorted, and all entries within it must have the same hash as the provided hash.
      * It must always contain at least two items, since otherwise a different object should be used.
@@ -27,6 +17,16 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
 
         this.hash = hash;
         this.children = children;
+    }
+
+    @SuppressWarnings("unchecked")
+    static <Key extends Comparable<Key>, Value> Collision<Key, Value> fromEntries(final long hash, final Entry<Key, Value> entry1, final Entry<Key, Value> entry2) {
+        assert entry1 != null;
+        assert entry2 != null;
+
+        final Entry[] children = new Entry[]{entry1, entry2};
+        Arrays.sort(children, Utils.keyComparator);
+        return new Collision(hash, children);
     }
 
     @Override

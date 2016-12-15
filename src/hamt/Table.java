@@ -16,8 +16,16 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
 
     @SuppressWarnings("unchecked")
     static <Key extends Comparable<Key>, Value> Table<Key, Value> fromSingleNode(final long hash, final int place, final Node<Key, Value> node) {
+        assert node != null;
+
         final int newPartHash = extractHashPart(hash, place);
-        return new Table(1L << newPartHash, new Node[] {node});
+        return new Table(1L << newPartHash, new Node[]{node});
+    }
+
+    private static int extractHashPart(long hash, int place) {
+        assert place >= 0;
+
+        return (int) ((hash & (Utils.mask << place)) >>> place);
     }
 
     @Override
@@ -84,9 +92,5 @@ public class Table<Key extends Comparable<Key>, Value> implements Node<Key, Valu
                 "population=" + Long.toBinaryString(population) +
                 ", children=" + Arrays.toString(children) +
                 '}';
-    }
-
-    private static int extractHashPart(long hash, int place) {
-        return (int) ((hash & (Utils.mask << place)) >>> place);
     }
 }

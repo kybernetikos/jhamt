@@ -8,7 +8,7 @@ public class Hamt<Key extends Comparable<Key>, Value> {
     private static final int nextPlace = 64 - topLevelBits - Utils.maskBits;
 
     private final Function<Key, Long> hasher;
-    private @SuppressWarnings("unchecked") final Node<Key, Value>[] nodes = new Node[1<<topLevelBits];
+    private @SuppressWarnings("unchecked") final Node<Key, Value>[] nodes = new Node[1 << topLevelBits];
 
     public Hamt() {
         this(key -> key == null ? 0L : Long.reverseBytes(key.hashCode()));
@@ -19,6 +19,10 @@ public class Hamt<Key extends Comparable<Key>, Value> {
             throw new NullPointerException("Must provide a hash function.");
         }
         this.hasher = hashFunction;
+    }
+
+    private static int getIndex(final long hash) {
+        return (int) (hash >>> (64 - topLevelBits));
     }
 
     public Value get(final Key key) {
@@ -62,9 +66,5 @@ public class Hamt<Key extends Comparable<Key>, Value> {
         return "Hamt{" +
                 "  nodes=" + Arrays.toString(nodes) +
                 '}';
-    }
-
-    private static int getIndex(final long hash) {
-        return (int) (hash >>> (64 - topLevelBits));
     }
 }

@@ -5,7 +5,6 @@ import java.util.function.Function
 class HamtUtilsTest extends GroovyTestCase {
     void testIndex32() {
         println "index32 Test"
-
         assert Utils.index32(0b0000_0000_0000_0000_0000_0000_0000_0000i, 0) == -1
         assert Utils.index32(0b0000_0000_0000_0000_0000_0000_0000_0001i, 0) == 0
         assert Utils.index32(0b0000_0000_0000_0000_0000_0000_0000_0010i, 0) == -1
@@ -33,7 +32,7 @@ class HamtUtilsTest extends GroovyTestCase {
     }
 
     void testObjRem() {
-        def seed =  new Date().getTime()
+        def seed = new Date().getTime()
         def rnd = new Random(seed)
         println "Random obj Test with seed $seed"
         def tree = new Hamt<Double, String>()
