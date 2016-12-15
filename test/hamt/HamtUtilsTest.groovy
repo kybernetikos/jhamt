@@ -72,14 +72,19 @@ class HamtUtilsTest extends GroovyTestCase {
     }
 
     void testNullObj() {
-        def tree = new Hamt<Double, String>()
+        println "Test with some null values"
 
+        def tree = new Hamt<Double, String>()
         tree.put(null, "null or thereabouts")
 
         assert tree.get(null) == "null or thereabouts"
 
-        tree.remove(null)
+        tree.put(null, null)
 
         assert tree.get(null) == null
+        assert tree.get(null, "empty") == null
+
+        tree.remove(null)
+        assert tree.get(null, "empty") == "empty"
     }
 }

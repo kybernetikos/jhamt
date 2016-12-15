@@ -1,9 +1,9 @@
 package hamt;
 
-import java.util.Comparator;
-
+/*
+ * An Entry stores the relationship between a key and value.
+ */
 public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
-    private final Comparator<Key> comparator = Comparator.nullsLast(Comparator.naturalOrder());
     private final long hash;
     private final Key key;
     private final Value value;
@@ -16,7 +16,7 @@ public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Valu
 
     @Override
     public Value get(long hash, int place, Key key, Value notPresent) {
-        if (hash != this.hash || comparator.compare(this.key, key) != 0) {
+        if (hash != this.hash || !keyMatches(key)) {
             return notPresent;
         }
         return value;
@@ -25,7 +25,7 @@ public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Valu
     @Override
     public Node<Key, Value> set(final long hash, final int place, final Key key, final Value value) {
         if (hash == this.hash) {
-            if (comparator.compare(this.key, key) == 0) {
+            if (keyMatches(key)) {
                 if (this.value == value) {
                     return this;
                 }
@@ -39,7 +39,7 @@ public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Valu
 
     @Override
     public Node<Key, Value> remove(final long hash, final int place, final Key key) {
-        if (hash == this.hash && comparator.compare(this.key, key) == 0) {
+        if (hash == this.hash && keyMatches(key)) {
             return null;
         }
         return this;
@@ -60,5 +60,9 @@ public class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Valu
 
     Value getValue() {
         return value;
+    }
+
+    private boolean keyMatches(final Key key) {
+        return Utils.nullFriendlyComparator.compare(this.key, key) == 0;
     }
 }

@@ -2,14 +2,17 @@ package hamt;
 
 import java.util.Arrays;
 
+/*
+ * A collision stores multiple entries that all share the same hash.
+ */
 public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
 
     private final long hash;
     private final Entry<Key, Value>[] children;
 
-    /**
+    /*
      * Children must be currently sorted, and all entries within it must have the same hash as the provided hash.
-     * It must always contain at least two items, since otherwise a different object should be used.
+     * It must always contain at least two items, since otherwise a null (0) or plain Entry (1) should be used.
      * Do not modify the children array after passing it into a Collision.
      */
     private Collision(final long hash, final Entry<Key, Value>[] children) {
@@ -54,10 +57,7 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
                 result[index] = entry;
                 return new Collision<>(hash, result);
             } else {
-                final int insertionIndex = -index - 1;
-                final Entry<Key, Value>[] result = Arrays.copyOf(children, children.length + 1);
-                System.arraycopy(children, insertionIndex, result, insertionIndex + 1, children.length - insertionIndex);
-                result[insertionIndex] = entry;
+                final Entry<Key, Value>[] result = Utils.arrayInsert(children, -index - 1, entry);
                 return new Collision<>(hash, result);
             }
         } else {
@@ -78,8 +78,7 @@ public class Collision<Key extends Comparable<Key>, Value> implements Node<Key, 
         if (children.length == 2) {
             return children[1 - index];
         }
-        final Entry<Key, Value>[] newChildren = Arrays.copyOf(children, children.length - 1);
-        System.arraycopy(children, index + 1, newChildren, index, children.length - index - 1);
+        final Entry<Key, Value>[] newChildren = Utils.arrayRemove(children, index);
         return new Collision<>(hash, newChildren);
     }
 

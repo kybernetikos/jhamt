@@ -11,18 +11,16 @@ public class Hamt<Key extends Comparable<Key>, Value> {
     private @SuppressWarnings("unchecked") final Node<Key, Value>[] nodes = new Node[1 << topLevelBits];
 
     public Hamt() {
+        // I reverse the bytes because otherwise an int32 hashcode would leave all the most significant bits
+        // of the hash empty, resulting in an unnecessarily nested structure.
         this(key -> key == null ? 0L : Long.reverseBytes(key.hashCode()));
     }
 
     public Hamt(final Function<Key, Long> hashFunction) {
         if (hashFunction == null) {
-            throw new NullPointerException("Must provide a hash function.");
+            throw new NullPointerException("If you wish to use a default hash function, call the 0-arg constructor.");
         }
         this.hasher = hashFunction;
-    }
-
-    private static int getIndex(final long hash) {
-        return (int) (hash >>> (64 - topLevelBits));
     }
 
     public Value get(final Key key) {
@@ -66,5 +64,9 @@ public class Hamt<Key extends Comparable<Key>, Value> {
         return "Hamt{" +
                 "  nodes=" + Arrays.toString(nodes) +
                 '}';
+    }
+
+    private static int getIndex(final long hash) {
+        return (int) (hash >>> (64 - topLevelBits));
     }
 }
