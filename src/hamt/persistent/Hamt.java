@@ -12,7 +12,7 @@ import java.util.function.Function;
  * TODO: pool unneeded entries and nodes
  * TODO: rehash instead of collision bucket
  */
-public class Hamt<Key extends Comparable<Key>, Value> {
+public final class Hamt<Key extends Comparable<Key>, Value> {
     private static final int defaultTopLevelBits = 10;
 
     private final int topLevelBits;
@@ -47,14 +47,35 @@ public class Hamt<Key extends Comparable<Key>, Value> {
 
         this.hashFunction = hashFunction;
         this.topLevelBits = topLevelBits;
-        this.nextPlace = 64 - topLevelBits - Utils.maskBits;
+        this.nextPlace = 64 - topLevelBits - Utils.maskBits64;
         this.nodes = nodes;
     }
 
+    /**
+     * Returns the value to which the specified key is mapped,
+     * or {@code null} if this map contains no mapping for the key.
+     *
+     * @see #get(Key, Value)
+     *
+     * @param key the key to search for.
+     * @return the value associated with the provided key or {@code null}
+     *          if no value is associated with the key.
+     */
     public Value get(final Key key) {
         return get(key, null);
     }
 
+    /**
+     * Returns the value to which the specified key is mapped,
+     * or the {@code notPresent} value if this map contains no mapping
+     * for the key.
+     *
+     * @see #put(Key, Value)
+     *
+     * @param key the key to search for.
+     * @param notPresent the value to return if the key is not mapped in
+     *                  this hamt.
+     */
     @SuppressWarnings("Duplicates")
     public Value get(final Key key, final Value notPresent) {
         final long hash = hashFunction.apply(key);
@@ -66,6 +87,14 @@ public class Hamt<Key extends Comparable<Key>, Value> {
         return node.get(hash, nextPlace, key, notPresent);
     }
 
+    /**
+     * Associates a value with a key into a new hamt. If the map previously
+     * contained a mapping for the key, the old value is replaced.
+     *
+     * @param key key with which the specified value is to be associated.
+     * @param value value to be associated with the specified key.
+     * @return a new Hamt containing the association.
+     */
     public Hamt<Key, Value> put(final Key key, final Value value) {
         final long hash = hashFunction.apply(key);
         final int realIndex = getIndex(hash);

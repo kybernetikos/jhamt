@@ -11,7 +11,7 @@ import java.util.function.Function;
  * TODO: pool unneeded entries and nodes
  * TODO: rehash instead of collision bucket
  */
-public class Hamt<Key extends Comparable<Key>, Value> {
+public final class Hamt<Key extends Comparable<Key>, Value> {
     private static final int defaultTopLevelBits = 10;
 
     private final int topLevelBits;
@@ -40,7 +40,7 @@ public class Hamt<Key extends Comparable<Key>, Value> {
 
         this.hashFunction = hashFunction;
         this.topLevelBits = topLevelBits;
-        this.nextPlace = 64 - topLevelBits - Utils.maskBits;
+        this.nextPlace = 64 - topLevelBits - Utils.maskBits64;
         this.nodes = new Node[1 << topLevelBits];
     }
 

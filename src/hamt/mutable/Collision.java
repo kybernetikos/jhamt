@@ -9,15 +9,16 @@ import hamt.Node;
 /*
  * A collision stores multiple entries that all share the same hash.
  */
-class Collision<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+final class Collision<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
 
     private final long hash;
     private final List<Entry<Key, Value>> children;
 
     /*
-     * Children must be currently sorted, and all entries within it must have the same hash as the provided hash.
+     * All entries within children must have the same hash as the provided hash.
      * It must always contain at least two items, since otherwise a null (0) or plain Entry (1) should be used.
      * Do not modify the children array after passing it into a Collision.
+     * The varargs are safe because all children get copied into a list.
      */
     @SafeVarargs
     Collision(final long hash, final Entry<Key, Value>... children) {
@@ -49,10 +50,7 @@ class Collision<Key extends Comparable<Key>, Value> implements Node<Key, Value> 
         final Entry<Key, Value> entry = new Entry<>(hash, key, value);
         final int index = Collections.binarySearch(children, entry, Entry.keyComparator);
         if (index >= 0) {
-            final Value oldValue = children.get(index).getValue();
-            if (oldValue != value) {
-                children.set(index, entry);
-            }
+            children.set(index, entry);
         } else {
             children.add(-index-1, entry);
         }

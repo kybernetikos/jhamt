@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+final class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
     private long population;
     private final List<Node<Key, Value>> children;
 
@@ -38,7 +38,7 @@ class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
             return notPresent;
         }
         final Node<Key, Value> newNode = children.get(realIndex);
-        return newNode.get(hash, place - Utils.maskBits, key, notPresent);
+        return newNode.get(hash, place - Utils.maskBits64, key, notPresent);
     }
 
     @Override
@@ -50,7 +50,7 @@ class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
             population |= 1L << newPartHash;
             children.add(newLocation, new Entry<>(hash, key, value));
         } else {
-            final Node<Key, Value> newNode = children.get(realIndex).set(hash, place - Utils.maskBits, key, value);
+            final Node<Key, Value> newNode = children.get(realIndex).set(hash, place - Utils.maskBits64, key, value);
             children.set(realIndex, newNode);
         }
         return this;
@@ -62,7 +62,7 @@ class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
         final int realIndex = Utils.index64(population, newPartHash);
         final long popPos = 1L << newPartHash;
         if (realIndex >= 0) {
-            final Node<Key, Value> newNode = children.get(realIndex).remove(hash, place - Utils.maskBits, key);
+            final Node<Key, Value> newNode = children.get(realIndex).remove(hash, place - Utils.maskBits64, key);
             if (newNode != null) {
                 children.set(realIndex, newNode);
                 return this;

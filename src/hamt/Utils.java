@@ -3,12 +3,14 @@ package hamt;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class Utils {
+public final class Utils {
+    private Utils() { /* Class not intended for instantiation */ }
+
     // the number of bits each level of the tree uses
-    public static final int maskBits = 6;
-    // a mask with maskBits number of 1s.  It will be shifted according to depth in the tree in order to extract
+    public static final int maskBits64 = 6;
+    // a mask with maskBits64 number of 1s.  It will be shifted according to depth in the tree in order to extract
     // some of the hash bits.
-    private static final long mask = (1L << maskBits) - 1;
+    private static final long mask64 = (1L << maskBits64) - 1;
     @SuppressWarnings("unchecked")
     private static final Comparator<Comparable> natural = Comparator.naturalOrder();
     public final static Comparator<Comparable> nullFriendlyComparator = Comparator.nullsLast(natural);
@@ -40,7 +42,7 @@ public class Utils {
     public static int extractHashPart64(final long hash, final int place) {
         assert place >= 0;
 
-        return (int) ((hash & (mask << place)) >>> place);
+        return (int) ((hash >>> place)  & mask64);
     }
 
     public static <T> T[] arrayInsert(final T[] array, final int position, final T value) {

@@ -5,7 +5,7 @@ import hamt.Utils;
 
 import java.util.Arrays;
 
-class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+final class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
     private final long population;
     private final Node<Key, Value>[] children;
 
@@ -38,7 +38,7 @@ class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
             return notPresent;
         }
         final Node<Key, Value> newNode = children[realIndex];
-        return newNode.get(hash, place - Utils.maskBits, key, notPresent);
+        return newNode.get(hash, place - Utils.maskBits64, key, notPresent);
     }
 
     @Override
@@ -50,7 +50,7 @@ class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
             final long newPopulation = population | (1L << newPartHash);
             return new Table<>(newPopulation, Utils.arrayInsert(children, newLocation, new Entry<>(hash, key, value)));
         } else {
-            final Node<Key, Value> newNode = children[realIndex].set(hash, place - Utils.maskBits, key, value);
+            final Node<Key, Value> newNode = children[realIndex].set(hash, place - Utils.maskBits64, key, value);
             if (children[realIndex] == newNode) {
                 return this;
             }
@@ -64,7 +64,7 @@ class Table<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
         final int realIndex = Utils.index64(population, newPartHash);
         final long popPos = 1L << newPartHash;
         if (realIndex >= 0) {
-            final Node<Key, Value> newNode = children[realIndex].remove(hash, place - Utils.maskBits, key);
+            final Node<Key, Value> newNode = children[realIndex].remove(hash, place - Utils.maskBits64, key);
             if (newNode != null) {
                 return new Table<>(population, Utils.arrayReplace(children, realIndex, newNode));
             } else {

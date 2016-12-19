@@ -7,7 +7,7 @@ import java.util.Comparator;
 /*
  * An Entry stores the relationship between a key and value.
  */
-class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+final class Entry<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
     @SuppressWarnings("unchecked")
     static final Comparator<Entry> keyComparator = Comparator.comparing(Entry::getKey, Utils.nullFriendlyComparator);
 

@@ -6,23 +6,30 @@ class MutableHamtTest extends GroovyTestCase {
     void testObjRem() {
         def seed = new Date().getTime()
         def rnd = new Random(seed)
-        println "Random obj Test with seed $seed"
+        println "Mutable Random obj Test with seed $seed"
+        def start = System.nanoTime()
+
         def tree = new Hamt<Double, String>()
 
         doSomeAddAndRemoves(rnd, 1000, tree)
+        println ".. finished ${System.nanoTime() - start}"
     }
 
     void testBadHasherObjRem() {
         def seed = new Date().getTime()
         def rnd = new Random(seed)
-        println "Bad hash (exercise collisions) obj Test with seed $seed"
+        println "Mutable Bad hash (exercise collisions) obj Test with seed $seed"
+        def start = System.nanoTime();
+
         def tree = new Hamt<Double, String>({ d -> Double.doubleToLongBits(d) >>> 45 } as Function<Double, Long>)
 
         doSomeAddAndRemoves(rnd, 800, tree)
+        println ".. finished ${System.nanoTime() - start}"
     }
 
     void testNullObj() {
-        println "Test with some null values"
+        println "Mutable Test with some null values"
+        def start = System.nanoTime()
 
         def tree = new Hamt<Double, String>()
         tree.put(null, "null or thereabouts")
@@ -36,20 +43,25 @@ class MutableHamtTest extends GroovyTestCase {
 
         tree.remove(null)
         assert tree.get(null, "empty") == "empty"
+
+        println ".. finished ${System.nanoTime() - start}"
     }
 
     void testWithWeirdTopLevelBits() {
         def seed = new Date().getTime()
         def rnd = new Random(seed)
-        println "Top level with weird bits, seed $seed"
+        println "Mutable Top level with weird bits, seed $seed"
+        def start = System.nanoTime();
 
         for (topLevelBits in 0..10) {
             def tree = new Hamt<Double, String>({ a -> Long.reverseBytes(a.hashCode()) } as Function<Double, Long>, topLevelBits)
             doSomeAddAndRemoves(rnd, 400, tree)
         }
+
+        println ".. finished ${System.nanoTime() - start}"
     }
 
-    static void doSomeAddAndRemoves(rnd, num, tree) {
+    void doSomeAddAndRemoves(rnd, num, tree) {
         def randomStrings = ["hello", "world", "marvellous", "things"]
         def data = [:]
         for (number in 0..num) {

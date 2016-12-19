@@ -8,7 +8,7 @@ import java.util.Arrays;
 /*
  * A collision stores multiple entries that all share the same hash.
  */
-class Collision<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
+final class Collision<Key extends Comparable<Key>, Value> implements Node<Key, Value> {
 
     private final long hash;
     private final Entry<Key, Value>[] children;
